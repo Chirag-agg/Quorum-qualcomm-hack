@@ -9,6 +9,8 @@ import re
 import tempfile
 from collections import Counter
 
+ADB_PATH = os.environ.get("ADB_EXECUTABLE", "adb")
+
 def normalize_answer(answer: str) -> str:
     """Simple normalization: strip whitespace and lowercase."""
     return re.sub(r'\s+', ' ', answer.strip().lower())
@@ -52,7 +54,7 @@ async def run_genie_client(device_id: str, ws_url: str):
                         device_prompt_path = "/data/local/tmp/prompt_temp.txt"
                         
                         # Push the prompt file via adb push
-                        subprocess.run(["adb", "push", local_path, device_prompt_path], check=True)
+                        subprocess.run([ADB_PATH, "push", local_path, device_prompt_path], check=True)
                         os.remove(local_path)
                         
                         model_basename = os.path.basename(model_dir.rstrip('/'))
@@ -68,7 +70,7 @@ async def run_genie_client(device_id: str, ws_url: str):
                         for i in range(N):
                             # We rely on temp=0.7/top-p=0.95 alone for sample diversity since seed variation
                             # isn't straightforward without rewriting the config file per run.
-                            result = subprocess.run(["adb", "shell", cmd_str], capture_output=True, text=True)
+                            result = subprocess.run([ADB_PATH, "shell", cmd_str], capture_output=True, text=True)
                             output = result.stdout
                             
                             # Parse stdout per rules
