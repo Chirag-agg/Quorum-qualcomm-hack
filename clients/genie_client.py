@@ -9,7 +9,7 @@ import re
 import tempfile
 from collections import Counter
 
-ADB_PATH = os.environ.get("ADB_EXECUTABLE", "adb")
+ADB_PATH = os.environ.get("ADB_EXECUTABLE", r"C:\Users\qcwor\platform-tools-latest-windows\platform-tools\adb.exe")
 
 def normalize_answer(answer: str) -> str:
     """Simple normalization: strip whitespace and lowercase."""
@@ -39,7 +39,7 @@ async def run_genie_client(device_id: str, ws_url: str):
                         N = int(os.environ.get("GENIE_SAMPLES", "3"))
                         answers = []
                         
-                        model_dir = os.environ.get("GENIE_MODEL_DIR", "/data/local/tmp/qwen2.5-1.5b-genie")
+                        model_dir = os.environ.get("GENIE_MODEL_DIR", "/data/local/tmp/qwen3_1_7b-geniex_qairt-w4a16-qualcomm_snapdragon_8_elite_gen5")
                         config_file = os.environ.get("GENIE_CONFIG_FILE", "genie_config.json")
                         
                         # Manually wrap with chat template
@@ -146,7 +146,7 @@ async def run_genie_client(device_id: str, ws_url: str):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--id", default="phone", help="Device ID")
-    parser.add_argument("--url", default="ws://localhost:8000/ws/device", help="Coordinator WS URL")
+    parser.add_argument("--url", default="ws://127.0.0.1:8000/ws/device", help="Coordinator WS URL")
     args = parser.parse_args()
     
     url = f"{args.url}/{args.id}"

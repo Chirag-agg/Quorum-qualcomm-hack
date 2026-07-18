@@ -3,11 +3,10 @@ import websockets
 import json
 
 async def trigger():
-    uri = "ws://localhost:8000/ws/dashboard"
+    uri = "ws://127.0.0.1:8000/ws/dashboard"
     async with websockets.connect(uri) as websocket:
-        # Dashboard connects, receives init
-        init_msg = await websocket.recv()
-        print("Received init:", init_msg)
+        # Dashboard connects
+        print("Connected to dashboard")
         
         # Send start command
         await websocket.send(json.dumps({
