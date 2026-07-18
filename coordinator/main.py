@@ -115,6 +115,9 @@ class CoordinatorRouter:
             
         elif msg_type == EventType.FINAL_ANSWER:
             ans = payload.get("answer")
+            if not ans or not ans.strip():
+                ans = "Empty response"
+            
             score = payload.get("quorum_score", 0.0)
             
             self.devices_state[device_id]["latency_ms"] = int((time.time() - self.metrics["start_time"]) * 1000)

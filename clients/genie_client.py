@@ -81,7 +81,13 @@ async def run_genie_client(device_id: str, ws_url: str):
                                 output = output.split("[END]", 1)[0]
                             
                             # Strip any <think>...</think> blocks (even empty ones — they can appear doubled)
-                            output = re.sub(r"<think>.*?</think>", "", output, flags=re.DOTALL)
+                            stripped_output = re.sub(r"<think>.*?</think>", "", output, flags=re.DOTALL)
+                            if not stripped_output.strip():
+                                # If stripping think blocks leaves nothing, the answer was entirely inside them.
+                                # Remove just the tags instead.
+                                output = re.sub(r"</?think>", "", output)
+                            else:
+                                output = re.sub(r"</?think>", "", stripped_output)
                             
                             final_answer = output.strip()
                             print(f"[{device_id}] Raw answer {i+1}:\n{final_answer}\n")

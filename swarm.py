@@ -213,7 +213,36 @@ def run_antigravity(instruction: str) -> str:
 
 
 def get_diff() -> str:
-    return subprocess.run(["git", "diff"], capture_output=True, text=True).stdout
+    tracked = subprocess.run(
+        ["git", "diff", "--", ".",
+         ":!swarm.log",
+         ":!reviewer_spend.json",
+         ":!codex_quota.json",
+         ":!swarm_reports/"],
+        capture_output=True, text=True
+    ).stdout
+
+    untracked = subprocess.run(
+        ["git", "status", "--porcelain=v1"],
+        capture_output=True, text=True
+    ).stdout
+
+    untracked_files = [
+        line[3:] for line in untracked.splitlines()
+        if line.startswith("??") and not any(
+            excl in line for excl in ["swarm.log", "reviewer_spend.json", "codex_quota.json", "swarm_reports/"]
+        )
+    ]
+
+    untracked_diff = ""
+    for f in untracked_files:
+        result = subprocess.run(
+            ["git", "diff", "--no-index", "/dev/null", f],
+            capture_output=True, text=True
+        )
+        untracked_diff += result.stdout
+
+    return tracked + untracked_diff
 
 
 def review_with_deepseek(diff: str, task_description: str, graph_ctx: str) -> str:
