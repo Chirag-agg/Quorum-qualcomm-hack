@@ -4,12 +4,23 @@ import json
 import argparse
 import sys
 import os
-import requests
 import re
+import requests
 from collections import Counter
 
 def normalize_answer(answer: str) -> str:
     return re.sub(r'\s+', ' ', answer.strip().lower())
+
+def fetch_sample(geniex_url: str, prompt: str) -> str:
+    headers = {"Content-Type": "application/json"}
+    payload = {
+        "model": "qwen3-4b",
+        "messages": [{"role": "user", "content": prompt}]
+    }
+    resp = requests.post(geniex_url, json=payload, headers=headers, timeout=300)
+    resp.raise_for_status()
+    data = resp.json()
+    return data["choices"][0]["message"]["content"]
 
 async def run_swarm_genie_client(device_id: str, ws_url: str, geniex_url: str):
     print(f"[{device_id}] Connecting to {ws_url}...")
@@ -21,9 +32,10 @@ async def run_swarm_genie_client(device_id: str, ws_url: str, geniex_url: str):
                 data = json.loads(message)
                 msg_type = data.get("type")
                 
-                # Only activate on the "wake" message type from the coordinator
+                # Only activate on the "wake" message type
                 if msg_type == "wake":
-                    prompt = data.get("payload", {}).get("prompt", "")
+                    payload_data = data.get("payload", {})
+                    prompt = payload_data.get("prompt", "")
                     print(f"\n[{device_id}] Received wake prompt: {prompt}")
                     
                     # Notify coordinator we are inferencing
@@ -35,30 +47,21 @@ async def run_swarm_genie_client(device_id: str, ws_url: str, geniex_url: str):
                     try:
                         N = int(os.environ.get("GENIE_SAMPLES", "3"))
                         answers = []
+                        normalized_answers = []
                         
                         for i in range(N):
-                            # POST standard OpenAI chat format to GenieX local server
-                            response = requests.post(
-                                geniex_url,
-                                json={
-                                    "model": "qwen3-4b",
-                                    "messages": [{"role": "user", "content": prompt}]
-                                },
-                                timeout=120
-                            )
-                            response.raise_for_status()
-                            response_json = response.json()
-                            final_answer = response_json["choices"][0]["message"]["content"]
+                            # POST standard OpenAI chat format to GenieX local server in a thread to avoid blocking the event loop
+                            final_answer = await asyncio.to_thread(fetch_sample, geniex_url, prompt)
                             print(f"[{device_id}] Raw answer {i+1}:\n{final_answer}\n")
                             answers.append(final_answer)
+                            normalized_answers.append(normalize_answer(final_answer))
                         
                         # Self-consistency scoring logic
-                        normalized_answers = [normalize_answer(a) for a in answers]
                         counts = Counter(normalized_answers)
                         majority_norm, majority_count = counts.most_common(1)[0]
                         quorum_score = majority_count / N
                         
-                        # dict-keyed-by-normalized-answer approach
+                        # dict-keyed-by-normalized-answer approach (reuse winner-selection logic)
                         norm_to_orig = {}
                         for orig, norm in zip(answers, normalized_answers):
                             if norm not in norm_to_orig:
@@ -66,8 +69,8 @@ async def run_swarm_genie_client(device_id: str, ws_url: str, geniex_url: str):
                                 
                         majority_ans = norm_to_orig[majority_norm]
                         
-                        # Using chunked-fake-streaming pattern since real SSE streaming support 
-                        # for this GenieX endpoint wasn't confirmed.
+                        # Path used: chunked-fake-streaming pattern
+                        # Real SSE streaming cannot be cleanly done while waiting for N samples to finish for majority voting.
                         chunks = re.findall(r'\S+|\s+', majority_ans)
                         for chunk in chunks:
                             if not chunk:
@@ -97,7 +100,7 @@ async def run_swarm_genie_client(device_id: str, ws_url: str, geniex_url: str):
                         await websocket.send(json.dumps({
                             "type": "final_answer",
                             "payload": {
-                                "answer": "ERROR: inference failed",
+                                "answer": f"ERROR: inference failed - {str(e)}",
                                 "quorum_score": 0.0
                             }
                         }))
