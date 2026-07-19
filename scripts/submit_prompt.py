@@ -11,7 +11,7 @@ async def trigger():
         # Send start command
         await websocket.send(json.dumps({
             "type": "start_inference",
-            "payload": {"prompt": "What is the capital of France?"}
+            "payload": {"prompt": "A bat and a ball cost $1.10 in total. The bat costs $1.00 more than the ball. How much does the ball cost?"}
         }))
         print("Triggered inference!")
         
