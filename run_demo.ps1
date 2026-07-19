@@ -1,4 +1,4 @@
-Start-Process powershell -ArgumentList "-NoExit", "-Command", ".\venv\Scripts\Activate.ps1; uvicorn coordinator.main:app --host 0.0.0.0 --port 8000"
+Start-Process powershell -ArgumentList "-NoExit", "-Command", ".\venv\Scripts\Activate.ps1; uvicorn coordinator.main:app --host 0.0.0.0 --port 8080"
 Start-Sleep -Seconds 2
 
 Start-Process powershell -ArgumentList "-NoExit", "-Command", ".\venv\Scripts\Activate.ps1; python clients\genie_client.py --id phone"

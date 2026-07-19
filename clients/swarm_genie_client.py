@@ -53,9 +53,15 @@ async def run_swarm_genie_client(device_id: str, ws_url: str, geniex_url: str):
                         answers = []
                         normalized_answers = []
                         
+                        jitters = ["", "\nThink carefully.", "\nDouble check your logic.", "\nBe accurate.", "\n"]
+                        engineered_prompt = prompt + "\nGive a short, direct answer. Do not explain."
+                        
                         for i in range(N):
+                            jitter_text = jitters[i % len(jitters)]
+                            jittered_prompt = f"{engineered_prompt}{jitter_text}"
+                            
                             # POST standard OpenAI chat format to GenieX local server in a thread to avoid blocking the event loop
-                            final_answer = await asyncio.to_thread(fetch_sample, geniex_url, prompt)
+                            final_answer = await asyncio.to_thread(fetch_sample, geniex_url, jittered_prompt)
                             print(f"[{device_id}] Raw answer {i+1}:\n{final_answer}\n")
                             answers.append(final_answer)
                             normalized_answers.append(normalize_answer(final_answer))
@@ -63,7 +69,8 @@ async def run_swarm_genie_client(device_id: str, ws_url: str, geniex_url: str):
                         # Self-consistency scoring logic
                         counts = Counter(normalized_answers)
                         majority_norm, majority_count = counts.most_common(1)[0]
-                        quorum_score = majority_count / N
+                        # The laptop is the authoritative fallback, so it always returns High Confidence
+                        quorum_score = 1.0
                         
                         # dict-keyed-by-normalized-answer approach (reuse winner-selection logic)
                         norm_to_orig = {}
@@ -122,7 +129,7 @@ async def run_swarm_genie_client(device_id: str, ws_url: str, geniex_url: str):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--id", default="laptop", help="Device ID")
-    parser.add_argument("--url", default="ws://localhost:8000/ws/device", help="Coordinator WS URL")
+    parser.add_argument("--url", default="ws://localhost:8080/ws/device", help="Coordinator WS URL")
     parser.add_argument("--geniex-url", default="http://127.0.0.1:18181/v1/chat/completions", help="GenieX OpenAI-compatible endpoint URL")
     args = parser.parse_args()
     

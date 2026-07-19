@@ -55,7 +55,7 @@ Open your terminal and navigate to your `quorum` project directory.
 **1. Start the FastAPI Coordinator**
 ```bash
 # Terminal 1
-python -m uvicorn coordinator.main:app --host 0.0.0.0 --port 8000
+python -m uvicorn coordinator.main:app --host 0.0.0.0 --port 8080
 ```
 
 **2. Start the React Dashboard**

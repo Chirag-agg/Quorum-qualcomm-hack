@@ -378,3 +378,47 @@ button.ask-btn:hover {
   line-height: 1.4;
   margin-top: 10px;
 }
+
+
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+.loading-scanner {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  z-index: 10;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-scanner::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 100%;
+  background: linear-gradient(to bottom, transparent, var(--crimson-hot), transparent);
+  animation: scan-line 1.5s linear infinite;
+  opacity: 0.5;
+}
+
+.loading-text {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  z-index: 11;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
+}

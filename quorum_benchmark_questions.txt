@@ -1,0 +1,77 @@
+=== SIMPLE FACT-BASED QUESTIONS (HIGH CONFIDENCE / LOCAL EXECUTION) ===
+These questions are designed to be unambiguous and factual, ensuring that all 3 jittered passes yield the exact same answer, leading to a high Quorum score and local execution on the phone.
+
+1. What does CPU stand for in computing?
+2. What is the chemical formula for water?
+3. Who developed the theory of general relativity?
+4. What does HTML stand for?
+5. What is the largest planet in our solar system?
+6. Which chemical element has the atomic number 1?
+7. What does HTTP stand for?
+8. In machine learning, what does NLP stand for?
+9. What is the powerhouse of the biological cell?
+10. Who is known as the father of modern computer science?
+11. What does GPU stand for?
+12. What is the name of the closest star to Earth?
+13. What is the fundamental unit of length in the metric system?
+14. What does DNA stand for?
+15. Which planet is known as the Red Planet?
+16. In which year did the Apollo 11 moon landing occur?
+17. What is the hardest naturally occurring substance on Earth?
+18. What is the main gas found in the Earth's atmosphere?
+19. What is the freezing point of water in Celsius?
+20. Who discovered penicillin?
+21. What does API stand for in software engineering?
+22. What is the capital city of France?
+23. What does RAM stand for?
+24. Which scientist proposed the three laws of motion?
+25. What is the largest mammal on Earth?
+26. What does CSS stand for in web development?
+27. Who painted the Mona Lisa?
+28. What is the symbol for the element Oxygen?
+29. What does URL stand for?
+30. In geometry, how many degrees are in a right angle?
+31. What is the boiling point of water at sea level in Celsius?
+32. What is the name of our galaxy?
+33. What does OS stand for in computing?
+34. Which organ in the human body is responsible for pumping blood?
+35. What is the chemical symbol for Gold?
+
+=== HARD QUESTIONS (LOW CONFIDENCE / ESCALATE TO LAPTOP) ===
+These questions involve complex logic, trick phrasing, or multi-step reasoning. A small 4B parameter model will likely hallucinate or vary its reasoning path across the 3 jittered passes, causing the Quorum score to drop and triggering an escalation to the laptop.
+
+1. If I have 17 sheep and all but 9 die, how many sheep are left?
+2. A bat and a ball cost $1.10 in total. The bat costs $1.00 more than the ball. Exactly how much does the ball cost?
+3. If it takes 5 machines 5 minutes to make 5 widgets, how long would it take 100 machines to make 100 widgets?
+4. In a lake, there is a patch of lily pads. Every day, the patch doubles in size. If it takes 48 days to cover the entire lake, how long would it take for the patch to cover half of the lake?
+5. A man is looking at a photograph of someone. His friend asks who it is. The man replies, "Brothers and sisters, I have none. But that man's father is my father's son." Who is in the photograph?
+6. How many times does the digit '9' appear in the numbers from 1 to 100?
+7. What is the next number in the sequence: 2, 4, 8, 16, 31, 57?
+8. If you have a 3-liter jug and a 5-liter jug, how can you measure exactly 4 liters of water?
+9. A farmer has a fox, a goose, and a bag of beans. He needs to cross a river, but his boat can only carry him and one item. If left alone, the fox eats the goose, and the goose eats the beans. How does he get everything across safely?
+10. I am an odd number. Take away a letter and I become even. What number am I?
+11. If two typists can type two pages in two minutes, how many typists will it take to type 18 pages in six minutes?
+12. You are in a race and you overtake the person in second place. What position are you in now?
+13. Mary's father has five daughters: 1. Nana, 2. Nene, 3. Nini, 4. Nono. What is the name of the fifth daughter?
+14. What has keys but can't open locks?
+15. If a plane crashes on the border of the United States and Canada, where do they bury the survivors?
+16. Some months have 31 days, others have 30 days. How many have 28 days?
+17. I have branches, but no fruit, trunk or leaves. What am I?
+18. What gets wetter the more it dries?
+19. Which weighs more: a pound of feathers or a pound of bricks?
+20. There are three doors. Door 1 leads to a fiery inferno. Door 2 leads to an assassin. Door 3 leads to a lion that hasn't eaten in three years. Which door is the safest?
+21. What belongs to you, but other people use it more than you do?
+22. You see a boat filled with people, yet there isn't a single person on board. How is that possible?
+23. The person who makes it has no need of it; the person who buys it has no use for it. The person who uses it can neither see nor feel it. What is it?
+24. If 1=3, 2=3, 3=5, 4=4, 5=4, what does 6 equal?
+25. I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?
+26. You measure my life in hours and I serve you by expiring. I'm quick when I'm thin and slow when I'm fat. The wind is my enemy. What am I?
+27. A doctor and a boy were fishing. The boy was the doctor's son, but the doctor was not the boy's father. Who was the doctor?
+28. What comes once in a minute, twice in a moment, but never in a thousand years?
+29. I am taken from a mine, and shut up in a wooden case, from which I am never released, and yet I am used by almost every person. What am I?
+30. If you drop a yellow hat in the Red Sea, what does it become?
+31. What is the mathematical probability of rolling a sum of 8 with three standard six-sided dice?
+32. What goes up and down but doesn't move?
+33. How can you add eight 8s to get the number 1,000?
+34. I have cities, but no houses. I have mountains, but no trees. I have water, but no fish. What am I?
+35. What word is spelled incorrectly in every dictionary?
