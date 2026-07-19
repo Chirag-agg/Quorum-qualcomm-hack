@@ -14,9 +14,13 @@ def normalize_answer(answer: str) -> str:
 def fetch_sample(geniex_url: str, prompt: str) -> str:
     headers = {"Content-Type": "application/json"}
     payload = {
-        "model": "qwen3-4b",
+        "model": "qualcomm/Qwen3-4B-Instruct-2507",
         "messages": [{"role": "user", "content": prompt}]
     }
+    
+    if not geniex_url.endswith("/v1/chat/completions"):
+        geniex_url = geniex_url.rstrip("/") + "/v1/chat/completions"
+        
     resp = requests.post(geniex_url, json=payload, headers=headers, timeout=300)
     resp.raise_for_status()
     data = resp.json()
