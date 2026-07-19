@@ -64,6 +64,21 @@ class CoordinatorRouter:
             del self.active_connections[device_id]
             self.devices_state[device_id]["status"] = "OFFLINE"
             event_logger.log("Device Disconnected", {"device_id": device_id})
+            
+            # HACKATHON FALLBACK
+            if state_machine.state == QuorumState.SCOUT and device_id == "phone":
+                print("\n*** CODE WORD: PHOENIX_PROTOCOL -> PHONE DISCONNECTED -> AUTO ESCALATING TO LAPTOP ***\n")
+                asyncio.create_task(self._trigger_fallback_escalation())
+
+    async def _trigger_fallback_escalation(self):
+        if state_machine.state == QuorumState.SCOUT:
+            self.escalated = True
+            self.metrics["escalations"] += 1
+            state_machine.transition_to(QuorumState.ESCALATE, "Phone disconnected - PHOENIX")
+            self.expected_devices = 2  # Only laptop and tablet remaining
+            wake_payload = {"prompt": getattr(self, "current_question", ""), "scenario": getattr(self, "current_scenario", "Hard Question")}
+            await self.send_to_device("laptop", {"type": "wake", "payload": wake_payload})
+            await self.send_to_device("tablet", {"type": "wake", "payload": wake_payload})
 
     def disconnect_dashboard(self, websocket: WebSocket):
         if websocket in self.dashboard_sockets:
