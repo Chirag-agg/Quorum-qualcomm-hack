@@ -44,3 +44,70 @@ The full pipeline runs end to end on physical hardware: a Snapdragon phone runni
 ## What This Is Not
 
 This is not a claim that small models are secretly as good as large ones. It's a claim that most queries don't need a large model at all, and the ones that do can be identified and routed there automatically, instead of paying the large-model cost on everything by default.
+
+## Test Cases For Checking
+
+Use these test cases to verify the end-to-end behavior of Quorum on real hardware.
+
+### TC-01: Fast local answer, no escalation
+
+Input prompt: What is 2 + 2?
+
+Expected result:
+
+1. Scout answers directly.
+2. No swarm escalation is triggered.
+3. Dashboard shows completed in Quorum Consensus.
+4. Timeline shows a direct local completion path.
+
+### TC-02: Ambiguous prompt triggers escalation
+
+Input prompt: Summarize the legal risks in this vague contract clause and suggest safer wording.
+
+Expected result:
+
+1. Scout confidence is low.
+2. Prompt escalates to swarm devices.
+3. Multiple device outputs appear in the dashboard.
+4. Consensus engine resolves a final answer.
+
+### TC-03: Consensus tie-break behavior
+
+Input prompt: Provide two interpretations of this policy sentence and pick the safest compliance stance.
+
+Expected result:
+
+1. At least two swarm devices produce different conclusions.
+2. Consensus engine applies majority vote.
+3. If tied, confidence-based tie-break is applied.
+4. Final state reaches completed.
+
+### TC-04: Latency and telemetry visibility
+
+Input prompt: Generate a 5-point summary of patient intake notes.
+
+Expected result:
+
+1. Per-device latency is shown on the dashboard.
+2. Token stream appears live while models reason.
+3. Timeline records each stage transition.
+4. Query appears in running history.
+
+### TC-05: Data boundary check
+
+Input prompt: Any internal test prompt containing sensitive data.
+
+Expected result:
+
+1. Request stays inside local network and devices.
+2. No cloud API is called.
+3. Same routing behavior still works for both easy and hard prompts.
+
+### Pass Criteria
+
+Quorum passes this check set if:
+
+1. Easy prompts complete locally without escalation.
+2. Hard prompts escalate and resolve via swarm consensus.
+3. Dashboard consistently shows state, latency, and timeline updates.
+4. All prompts remain inside the local compliance boundary.
