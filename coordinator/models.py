@@ -5,7 +5,6 @@ from typing import Optional, Any, Dict
 class DeviceType(str, Enum):
     PHONE = "phone"
     LAPTOP = "laptop"
-    TABLET = "tablet"
     DASHBOARD = "dashboard"
 
 class DeviceStatus(str, Enum):

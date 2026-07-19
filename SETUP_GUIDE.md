@@ -8,7 +8,7 @@ This guide provides step-by-step instructions for running the Quorum distributed
 
 To run Quorum successfully, you need three main components running simultaneously:
 1. **The Coordinator & Dashboard (Laptop)**: The central brain that hosts the FastAPI WebSocket server and the React UI.
-2. **The Swarm Devices (Laptop)**: Local Python scripts simulating the "Laptop" and "Tablet" nodes for the consensus swarm.
+2. **The Swarm Devices (Laptop)**: Local Python scripts simulating the "Laptop" node for the consensus swarm.
 3. **The physical Phone (Snapdragon)**: The initial "Scout" device that evaluates the prompt first using its NPU.
 
 > [!TIP]
@@ -73,15 +73,10 @@ Open your browser to `http://localhost:5173` to view the UI.
 
 With the coordinator and dashboard running, it's time to connect the devices.
 
-**1. Start the Laptop & Tablet Nodes (Mock)**
+**1. Start the Laptop Node (Mock)**
 These act as your escalation swarm. They don't need real NPU execution for the demo to prove the networking architecture.
 ```bash
-# Terminal 3
 python clients/mock_client.py --id laptop
-```
-```bash
-# Terminal 4
-python clients/mock_client.py --id tablet
 ```
 
 **2. Start the Physical Phone Node (Real NPU)**
@@ -106,7 +101,7 @@ python clients/genie_client.py --id phone
 ```
 
 > [!IMPORTANT]  
-> Watch the React Dashboard! As soon as you run the above commands, you should see the Laptop, Tablet, and Phone transition from `OFFLINE` to `SLEEPING`.
+> Watch the React Dashboard! As soon as you run the above commands, you should see the Laptop and Phone transition from `OFFLINE` to `SLEEPING`.
 
 ---
 
@@ -122,4 +117,4 @@ python clients/genie_client.py --id phone
 - The Snapdragon NPU processes the prompt and streams tokens back to the laptop via ADB stdout.
 - `genie_client.py` intercepts the tokens and streams them over WebSockets to the Coordinator.
 - The dashboard animates the token stream live.
-- Because it's a "Hard" question, the confidence score is low. The system automatically escalates, waking up the Laptop and Tablet to achieve consensus.
+- Because it's a "Hard" question, the confidence score is low. The system automatically escalates, waking up the Laptop to achieve consensus.
