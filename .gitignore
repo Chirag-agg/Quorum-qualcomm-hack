@@ -2,3 +2,9 @@ node_modules/
 __pycache__/
 *.pyc
 .env
+codex_quota.json
+/swarm_reports
+reviewer_spend.json
+swarm.log
+task.md
+quorum-hackathon-deck.html

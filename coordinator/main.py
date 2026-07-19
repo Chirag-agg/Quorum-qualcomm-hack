@@ -43,8 +43,7 @@ class CoordinatorRouter:
         # Track device specific state
         self.devices_state = {
             "phone": {"status": "SLEEPING", "tokens": 0, "latency_ms": 0, "decision": ""},
-            "laptop": {"status": "SLEEPING", "tokens": 0, "latency_ms": 0, "decision": ""},
-            "tablet": {"status": "SLEEPING", "tokens": 0, "latency_ms": 0, "decision": ""}
+            "laptop": {"status": "SLEEPING", "tokens": 0, "latency_ms": 0, "decision": ""}
         }
 
     async def connect_device(self, websocket: WebSocket, device_id: str):
@@ -64,6 +63,20 @@ class CoordinatorRouter:
             del self.active_connections[device_id]
             self.devices_state[device_id]["status"] = "OFFLINE"
             event_logger.log("Device Disconnected", {"device_id": device_id})
+            
+            # HACKATHON FALLBACK
+            if state_machine.state == QuorumState.SCOUT and device_id == "phone":
+                print("\n*** CODE WORD: PHOENIX_PROTOCOL -> PHONE DISCONNECTED -> AUTO ESCALATING TO LAPTOP ***\n")
+                asyncio.create_task(self._trigger_fallback_escalation())
+
+    async def _trigger_fallback_escalation(self):
+        if state_machine.state == QuorumState.SCOUT:
+            self.escalated = True
+            self.metrics["escalations"] += 1
+            state_machine.transition_to(QuorumState.ESCALATE, "Phone disconnected - PHOENIX")
+            self.expected_devices = 1  # Only laptop remaining
+            wake_payload = {"prompt": getattr(self, "current_question", ""), "scenario": getattr(self, "current_scenario", "Hard Question")}
+            await self.send_to_device("laptop", {"type": "wake", "payload": wake_payload})
 
     def disconnect_dashboard(self, websocket: WebSocket):
         if websocket in self.dashboard_sockets:
@@ -115,6 +128,9 @@ class CoordinatorRouter:
             
         elif msg_type == EventType.FINAL_ANSWER:
             ans = payload.get("answer")
+            if not ans or not ans.strip():
+                ans = "Empty response"
+            
             score = payload.get("quorum_score", 0.0)
             
             self.devices_state[device_id]["latency_ms"] = int((time.time() - self.metrics["start_time"]) * 1000)
@@ -139,13 +155,12 @@ class CoordinatorRouter:
                     self.metrics["escalations"] += 1
                     state_machine.transition_to(QuorumState.ESCALATE, f"Score {score} < {self.QUORUM_THRESHOLD}")
                     
-                    # Wake up laptop and tablet
-                    self.expected_devices = 3
+                    # Wake up laptop
+                    self.expected_devices = 2
                     
                     # Pass the scenario down
                     wake_payload = {"prompt": self.current_question, "scenario": self.current_scenario}
                     await self.send_to_device("laptop", {"type": EventType.WAKE, "payload": wake_payload})
-                    await self.send_to_device("tablet", {"type": EventType.WAKE, "payload": wake_payload})
                     
             elif state_machine.state == QuorumState.ESCALATE:
                 if len(self.candidates) == self.expected_devices:

@@ -38,8 +38,6 @@ async def run_client(device_id: str, ws_url: str):
                         score = 0.40 if device_id == "phone" else 0.95
                     elif scenario == "Disagreement":
                         score = 0.40 if device_id == "phone" else 0.95
-                        if device_id == "tablet":
-                            answer = "Berlin"
                             
                     # Simulate Token Stream
                     if answer == "Paris":
@@ -82,7 +80,7 @@ async def run_client(device_id: str, ws_url: str):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--id", required=True, help="Device ID (phone, laptop, tablet)")
+    parser.add_argument("--id", required=True, help="Device ID (phone, laptop)")
     parser.add_argument("--url", default="ws://localhost:8000/ws/device", help="Coordinator WS URL")
     args = parser.parse_args()
     
